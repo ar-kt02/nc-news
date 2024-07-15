@@ -28,3 +28,17 @@ describe("/api/topics", () => {
          });
    });
 });
+
+describe("/api", () => {
+   test("GET 200: Should respond with all endpoints and description as an object", () => {
+      return request(app)
+         .get("/api")
+         .expect(200)
+         .then(({ body: { endpoints } }) => {
+            const endpointsJson = require("../endpoints.json");
+
+            expect(typeof endpoints).toBe("object");
+            expect(endpoints).toEqual(endpointsJson);
+         });
+   });
+});
