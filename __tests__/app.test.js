@@ -3,6 +3,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const db = require("../db/connection");
+const comments = require("../db/data/test-data/comments");
 
 beforeEach(() => {
    return seed(testData);
@@ -89,7 +90,7 @@ describe("/api/articles", () => {
          .get("/api/articles")
          .expect(200)
          .then(({ body: { articles } }) => {
-            console.log(articles);
+            expect(articles.length).toBeGreaterThan(0);
             articles.forEach((article) => {
                expect(article).toMatchObject({
                   author: expect.any(String),
@@ -106,7 +107,7 @@ describe("/api/articles", () => {
          });
    });
 
-   test("GET 200: Should respond with all articles sorted in descending order", () => {
+   test("GET 200: Should respond with all articles sorted by date created in descending order", () => {
       return request(app)
          .get("/api/articles")
          .expect(200)
@@ -114,6 +115,65 @@ describe("/api/articles", () => {
             expect(articles).toBeSortedBy("created_at", {
                descending: true,
             });
+         });
+   });
+});
+
+describe("/api/articles/:article_id/comments", () => {
+   test("GET 200: Should respond with an array of all comments for the article of a specific article_id", () => {
+      return request(app)
+         .get("/api/articles/5/comments")
+         .expect(200)
+         .then(({ body: { comments } }) => {
+            expect(comments.length).toBeGreaterThan(0);
+            comments.forEach((comment) => {
+               expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  body: expect.any(String),
+                  article_id: expect.any(Number),
+                  author: expect.any(String),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+               });
+            });
+         });
+   });
+
+   test("GET 200: Responds with all comments for the article sorted by created_at in descending order", () => {
+      return request(app)
+         .get("/api/articles/1/comments")
+         .expect(200)
+         .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy("created_at", {
+               descending: true,
+            });
+         });
+   });
+
+   test("GET 200; Responds with an empty array when passed a valid article_id without comments", () => {
+      return request(app)
+         .get("/api/articles/10/comments")
+         .expect(200)
+         .then(({ body: { comments } }) => {
+            expect(comments).toEqual([]);
+         });
+   });
+
+   test("GET 404: Responds with error msg 'Article not found' when passed an article id that does not exist", () => {
+      return request(app)
+         .get("/api/articles/4282/comments")
+         .expect(404)
+         .then(({ body: { msg } }) => {
+            expect(msg).toBe("Article not found");
+         });
+   });
+
+   test("GET 400: Responds with error msg 'Bad request' when passed an invalid data type as article id", () => {
+      return request(app)
+         .get("/api/articles/ninenine/comments")
+         .expect(400)
+         .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad request");
          });
    });
 });

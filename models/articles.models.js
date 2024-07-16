@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkArticleExists } = require("../utils");
 
 exports.fetchArticles = () => {
    const sqlStr = `
@@ -33,4 +34,24 @@ exports.fetchArticleById = (article_id = undefined) => {
       }
       return rows[0];
    });
+};
+
+exports.fetchArticleByIdComments = (article_id) => {
+   return checkArticleExists(article_id)
+      .then((result) => {
+         if (!result) {
+            return Promise.reject({ status: 404, msg: "Article not found" });
+         }
+      })
+      .then(() => {
+         const sqlStr = `
+         SELECT * FROM comments 
+         WHERE 
+         article_id = $1 
+         ORDER BY created_at DESC`;
+
+         return db.query(sqlStr, [article_id]).then(({ rows }) => {
+            return rows;
+         });
+      });
 };
