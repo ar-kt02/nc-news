@@ -190,7 +190,7 @@ describe("/api/articles", () => {
          });
    });
 
-   test("GET 200: Should respond with all articles sorted by date created in descending order", () => {
+   test("GET 200: Should respond with all articles sorted by date created in descending order by default", () => {
       return request(app)
          .get("/api/articles")
          .expect(200)
@@ -199,6 +199,39 @@ describe("/api/articles", () => {
                descending: true,
             });
          });
+   });
+
+   describe("GET Request: Sorting queries", () => {
+      test("GET 200: Should respond with all articles sorted by votes and by default: in descending order", () => {
+         return request(app)
+            .get("/api/articles?sort_by=votes")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles).toBeSortedBy("votes", {
+                  descending: true,
+               });
+            });
+      });
+
+      test("GET 200: Should respond with all articles sorted by votes and in ascending order (case insensitive)", () => {
+         return request(app)
+            .get("/api/articles?sort_by=votes&order=ASC")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles).toBeSortedBy("votes", {
+                  ascending: true,
+               });
+            });
+      });
+
+      test("GET 400: Should respond with err message 'Invalid query' when passed an invalid sort_by or order value", () => {
+         return request(app)
+            .get("/api/articles?sort_by=vote$&order=de $ c")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Invalid query");
+            });
+      });
    });
 });
 
