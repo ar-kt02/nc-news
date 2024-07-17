@@ -15,3 +15,11 @@ exports.checkUserExists = (username) => {
       return rows.length > 0 ? true : false;
    });
 };
+
+exports.checkCommentExists = (comment_id) => {
+   const sqlStr = "SELECT * FROM comments WHERE comment_id = $1";
+
+   return db.query(sqlStr, [comment_id]).then(({ rows }) => {
+      return rows.length > 0 ? true : false;
+   });
+};

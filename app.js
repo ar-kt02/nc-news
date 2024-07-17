@@ -8,7 +8,10 @@ const {
    getArticleByIdComments,
    patchArticleById,
 } = require("./controllers/articles.controllers.js");
-const { postComment } = require("./controllers/comments.controllers.js");
+const {
+   postComment,
+   deleteCommentById,
+} = require("./controllers/comments.controllers.js");
 const {
    sqlErrors,
    serverErrors,
@@ -28,6 +31,8 @@ app.patch("/api/articles/:article_id", patchArticleById);
 
 app.get("/api/articles/:article_id/comments", getArticleByIdComments);
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.use(sqlErrors);
 
