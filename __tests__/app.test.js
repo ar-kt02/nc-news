@@ -3,7 +3,6 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const db = require("../db/connection");
-const comments = require("../db/data/test-data/comments");
 
 beforeEach(() => {
    return seed(testData);
@@ -81,6 +80,90 @@ describe("/api/articles/:article_id", () => {
          .then(({ body: { msg } }) => {
             expect(msg).toBe("Bad request");
          });
+   });
+
+   describe("PATCH request", () => {
+      test("PATCH 200: Responds with successefuly updated article by its id as an object", () => {
+         const patchData = { inc_votes: 2000 };
+
+         return request(app)
+            .patch("/api/articles/4")
+            .send(patchData)
+            .expect(200)
+            .then(({ body: { article } }) => {
+               expect(article).toEqual({
+                  article_id: 4,
+                  title: "Student SUES Mitch!",
+                  topic: "mitch",
+                  author: "rogersop",
+                  body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+                  created_at: "2020-05-06T01:14:00.000Z",
+                  votes: 2000,
+                  article_img_url:
+                     "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+               });
+            });
+      });
+
+      test("PATCH 404: Responds with error msg 'Article not found' when passed an article id that does not exist", () => {
+         const patchData = { inc_votes: 3200 };
+
+         return request(app)
+            .patch("/api/articles/53534")
+            .send(patchData)
+            .expect(404)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Article not found");
+            });
+      });
+
+      test("PATCH 400: Responds with err message 'Bad request' when passed an empty object", () => {
+         const patchData = {};
+
+         return request(app)
+            .patch("/api/articles/4")
+            .send(patchData)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with err message 'Bad request' when does not contain 'inc_votes' property", () => {
+         const patchData = { increment_votes: 2000 };
+
+         return request(app)
+            .patch("/api/articles/4")
+            .send(patchData)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with error msg 'Bad request' when passed an invalid data type as article id", () => {
+         const patchData = { inc_votes: 3200 };
+
+         return request(app)
+            .patch("/api/articles/threethousand")
+            .send(patchData)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with error msg 'Bad request' when inc_votes property value has an invalid data type", () => {
+         const patchData = { inc_votes: "threethousand" };
+
+         return request(app)
+            .patch("/api/articles/2")
+            .send(patchData)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
    });
 });
 

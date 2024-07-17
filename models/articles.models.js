@@ -23,7 +23,7 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id = undefined) => {
-   let sqlStr = `SELECT * FROM articles WHERE article_id = $1`;
+   const sqlStr = `SELECT * FROM articles WHERE article_id = $1`;
 
    return db.query(sqlStr, [article_id]).then(({ rows }) => {
       if (rows.length === 0) {
@@ -52,6 +52,26 @@ exports.fetchArticleByIdComments = (article_id) => {
 
          return db.query(sqlStr, [article_id]).then(({ rows }) => {
             return rows;
+         });
+      });
+};
+
+exports.updateArticleById = (article_id, inc_votes) => {
+   return checkArticleExists(article_id)
+      .then((result) => {
+         if (!result) {
+            return Promise.reject({ status: 404, msg: "Article not found" });
+         }
+      })
+      .then(() => {
+         const sqlStr = `
+         UPDATE articles 
+         SET votes = votes + $1
+         WHERE article_id = $2
+         RETURNING *`;
+
+         return db.query(sqlStr, [inc_votes, article_id]).then(({ rows }) => {
+            return rows[0];
          });
       });
 };
