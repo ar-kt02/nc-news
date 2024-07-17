@@ -4,7 +4,11 @@ const {
    createRef,
    formatComments,
 } = require("../db/seeds/utils");
-const { checkArticleExists, checkUserExists } = require("../utils.js");
+const {
+   checkArticleExists,
+   checkUserExists,
+   checkCommentExists,
+} = require("../utils.js");
 
 afterAll(() => {
    return db.end();
@@ -130,6 +134,20 @@ describe("checkUserExists", () => {
    });
    test("returns false if username does not exist", () => {
       return checkUserExists("some-panda").then((result) => {
+         expect(result).toBe(false);
+      });
+   });
+});
+
+describe("checkCommentExists", () => {
+   test("returns true if comment exists", () => {
+      return checkCommentExists(6).then((result) => {
+         expect(result).toBe(true);
+      });
+   });
+
+   test("returns false if comment does not exist", () => {
+      return checkCommentExists(123442).then((result) => {
          expect(result).toBe(false);
       });
    });

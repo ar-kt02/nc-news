@@ -358,3 +358,29 @@ describe("/api/articles/:article_id/comments", () => {
       });
    });
 });
+
+describe("/api/comments/:comment_id", () => {
+   describe("DELETE request", () => {
+      test("DELETE 204: Should respond with status 204 and no content to return", () => {
+         return request(app).delete("/api/comments/4").expect(204);
+      });
+
+      test("DELETE 404: Should respond with error msg 'Comment not found' when passed a comment_id that does not exist in database", () => {
+         return request(app)
+            .delete("/api/comments/123456")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Comment not found");
+            });
+      });
+
+      test("DELETE 400: Should respond with error msg 'Bad request' when passed an invalid data type as comment_id", () => {
+         return request(app)
+            .delete("/api/comments/onetwothree$- four -")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+   });
+});
