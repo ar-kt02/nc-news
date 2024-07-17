@@ -12,6 +12,7 @@ const {
    postComment,
    deleteCommentById,
 } = require("./controllers/comments.controllers.js");
+const { getUsers } = require("./controllers/users.controllers.js");
 const {
    sqlErrors,
    serverErrors,
@@ -23,6 +24,8 @@ app.use(express.json());
 app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/articles", getArticles);
 

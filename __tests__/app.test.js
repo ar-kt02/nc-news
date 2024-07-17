@@ -384,3 +384,23 @@ describe("/api/comments/:comment_id", () => {
       });
    });
 });
+
+describe("/api/users", () => {
+   describe("GET request", () => {
+      test("GET 200: Should respond with an array of objects with username, name, avatar_url as properties of all users", () => {
+         return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body: { users } }) => {
+               expect(users.length).toBe(4);
+               users.forEach((user) => {
+                  expect(user).toEqual({
+                     username: expect.any(String),
+                     name: expect.any(String),
+                     avatar_url: expect.any(String),
+                  });
+               });
+            });
+      });
+   });
+});
