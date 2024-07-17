@@ -6,6 +6,7 @@ const {
    getArticles,
    getArticleById,
    getArticleByIdComments,
+   patchArticleById,
 } = require("./controllers/articles.controllers.js");
 const { postComment } = require("./controllers/comments.controllers.js");
 const {
@@ -23,9 +24,9 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.get("/api/articles/:article_id/comments", getArticleByIdComments);
-
 app.post("/api/articles/:article_id/comments", postComment);
 
 app.use(sqlErrors);

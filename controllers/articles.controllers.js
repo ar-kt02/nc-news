@@ -1,7 +1,9 @@
+const { response } = require("../app.js");
 const {
    fetchArticles,
    fetchArticleById,
    fetchArticleByIdComments,
+   updateArticleById,
 } = require("../models/articles.models.js");
 
 exports.getArticles = (request, response, next) => {
@@ -27,6 +29,17 @@ exports.getArticleByIdComments = (request, response, next) => {
    fetchArticleByIdComments(article_id)
       .then((comments) => {
          response.status(200).send({ comments });
+      })
+      .catch(next);
+};
+
+exports.patchArticleById = (request, response, next) => {
+   const { article_id } = request.params;
+   const { inc_votes } = request.body;
+
+   updateArticleById(article_id, inc_votes)
+      .then((article) => {
+         response.status(200).send({ article });
       })
       .catch(next);
 };
