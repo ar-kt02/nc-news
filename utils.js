@@ -7,3 +7,11 @@ exports.checkArticleExists = (article_id) => {
       return rows.length > 0 ? true : false;
    });
 };
+
+exports.checkUserExists = (username) => {
+   sqlStr = "SELECT * FROM users WHERE username = $1";
+
+   return db.query(sqlStr, [username]).then(({ rows }) => {
+      return rows.length > 0 ? true : false;
+   });
+};

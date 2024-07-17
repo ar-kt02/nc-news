@@ -4,7 +4,7 @@ const {
    createRef,
    formatComments,
 } = require("../db/seeds/utils");
-const { checkArticleExists } = require("../utils.js");
+const { checkArticleExists, checkUserExists } = require("../utils.js");
 
 afterAll(() => {
    return db.end();
@@ -117,6 +117,19 @@ describe("checkArticleExists", () => {
    });
    test("returns false if article_id does not exiest", () => {
       return checkArticleExists(999).then((result) => {
+         expect(result).toBe(false);
+      });
+   });
+});
+
+describe("checkUserExists", () => {
+   test("returns true if username exists", () => {
+      return checkUserExists("rogersop").then((result) => {
+         expect(result).toBe(true);
+      });
+   });
+   test("returns false if username does not exist", () => {
+      return checkUserExists("some-panda").then((result) => {
          expect(result).toBe(false);
       });
    });

@@ -1,5 +1,5 @@
 exports.sqlErrors = (err, request, response, next) => {
-   const errorCodes = ["22P02"];
+   const errorCodes = ["22P02", "23502"];
    if (errorCodes.includes(err.code)) {
       response.status(400).send({ msg: "Bad request" });
    }
