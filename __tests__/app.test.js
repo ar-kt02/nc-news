@@ -46,20 +46,20 @@ describe("/api", () => {
 describe("/api/articles/:article_id", () => {
    test("GET 200: Should respond an object of the article by its id with following properties: author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
       return request(app)
-         .get("/api/articles/3")
+         .get("/api/articles/1")
          .expect(200)
          .then(({ body: { article } }) => {
-            expect(typeof article).toBe("object");
             expect(article).toEqual({
-               article_id: 3,
-               title: "Eight pug gifs that remind me of mitch",
+               article_id: 1,
+               title: "Living in the shadow of a great man",
                topic: "mitch",
-               author: "icellusedkars",
-               body: "some gifs",
-               created_at: "2020-11-03T09:12:00.000Z",
-               votes: 0,
+               author: "butter_bridge",
+               body: "I find this existence challenging",
+               created_at: "2020-07-09T20:11:00.000Z",
+               votes: 100,
                article_img_url:
                   "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+               comment_count: 11,
             });
          });
    });
