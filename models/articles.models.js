@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { sort } = require("../db/data/test-data/articles");
 const { checkArticleExists } = require("../utils");
 
 exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
@@ -51,8 +50,13 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
    });
 };
 
-exports.fetchArticleById = (article_id = undefined) => {
-   const sqlStr = `SELECT * FROM articles WHERE article_id = $1`;
+exports.fetchArticleById = (article_id) => {
+   const sqlStr = `
+   SELECT articles.*, COUNT(comments.comment_id)::INT as comment_count
+   FROM articles
+   LEFT JOIN comments USING (article_id)
+   WHERE articles.article_id = $1
+   GROUP BY articles.article_id`;
 
    return db.query(sqlStr, [article_id]).then(({ rows }) => {
       if (rows.length === 0) {
