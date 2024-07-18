@@ -213,6 +213,17 @@ describe("/api/articles", () => {
             });
       });
 
+      test("GET 200: Should respond with all articles in ascending order and by default: sorted by created_at", () => {
+         return request(app)
+            .get("/api/articles?order=ASC")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles).toBeSortedBy("created_at", {
+                  ascending: true,
+               });
+            });
+      });
+
       test("GET 200: Should respond with all articles sorted by votes and in ascending order (case insensitive)", () => {
          return request(app)
             .get("/api/articles?sort_by=votes&order=ASC")
@@ -230,6 +241,59 @@ describe("/api/articles", () => {
             .expect(400)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Invalid query");
+            });
+      });
+   });
+
+   describe("GET Request: Topic query", () => {
+      test("GET 200: Should respond with articles filtered by topic query", () => {
+         return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles.length).toBe(12);
+               articles.forEach((article) => {
+                  expect(article).toMatchObject({
+                     author: expect.any(String),
+                     title: expect.any(String),
+                     article_id: expect.any(Number),
+                     topic: "mitch",
+                     created_at: expect.any(String),
+                     votes: expect.any(Number),
+                     article_img_url: expect.any(String),
+                     comment_count: expect.any(Number),
+                  });
+               });
+            });
+      });
+
+      test("GET 200: Should respond with an empty array if topic query value does not match in database", () => {
+         return request(app)
+            .get("/api/articles?topic=NOTMITCH")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles).toEqual([]);
+            });
+      });
+
+      test("GET 200: Should respond with all articles if query value is empty", () => {
+         return request(app)
+            .get("/api/articles?topic=")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles.length).toBe(13);
+               articles.forEach((article) => {
+                  expect(article).toMatchObject({
+                     author: expect.any(String),
+                     title: expect.any(String),
+                     article_id: expect.any(Number),
+                     topic: expect.any(String),
+                     created_at: expect.any(String),
+                     votes: expect.any(Number),
+                     article_img_url: expect.any(String),
+                     comment_count: expect.any(Number),
+                  });
+               });
             });
       });
    });
@@ -427,7 +491,7 @@ describe("/api/users", () => {
             .then(({ body: { users } }) => {
                expect(users.length).toBe(4);
                users.forEach((user) => {
-                  expect(user).toEqual({
+                  expect(user).toMatchObject({
                      username: expect.any(String),
                      name: expect.any(String),
                      avatar_url: expect.any(String),

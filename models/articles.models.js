@@ -2,7 +2,7 @@ const db = require("../db/connection");
 const { sort } = require("../db/data/test-data/articles");
 const { checkArticleExists } = require("../utils");
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
    const validSortBys = [
       "article_id",
       "title",
@@ -37,9 +37,16 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
    articles
    `;
 
+   let queryValues = [];
+
+   if (topic) {
+      sqlStr += ` WHERE topic = $1`;
+      queryValues.push(topic);
+   }
+
    sqlStr += ` ORDER BY ${sort_by} ${order.toLowerCase()}`;
 
-   return db.query(sqlStr).then(({ rows }) => {
+   return db.query(sqlStr, queryValues).then(({ rows }) => {
       return rows;
    });
 };
