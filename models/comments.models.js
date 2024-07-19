@@ -62,10 +62,7 @@ exports.updateCommentById = (comment_id, inc_votes) => {
    return checkCommentExists(comment_id)
       .then((result) => {
          if (!result) {
-            return Promise.reject({
-               status: 404,
-               msg: "Comment does not exist",
-            });
+            return Promise.reject({ status: 404, msg: "Comment not found" });
          }
       })
       .then(() => {
