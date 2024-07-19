@@ -1,11 +1,67 @@
 # Northcoders News API
 
----
+Hosted with Supabase and Render:
 
-Steps to clone locally:
+[Live app on Render](https://nc-news-id0p.onrender.com/api)
 
-1. You will need to create two .env files for your project: .env.test and .env.development.
-2. Into each, add PGDATABASE=, with the correct database name for that environment (see /db/setup.sql for the database names). Double check that these .env files are .gitignored.
+## Summary
+
+Northcoders News API is a backend API built for a social news website where users can interact with articles through comments and votes, similar to Reddit.
+
+## Recommended versions:
+
+Node.js v22.2.0 or later
+
+Postgres v14.11 or later
+
+## Setup instructions
+
+### 1. Clone the repository:
+
+```
+git clone https://github.com/ar-kt02/nc-news
+```
+
+### 2. Install necessary dependencies:
+
+```
+npm install
+```
+
+### 3. Setting up your .env:
+
+Create the file .env.test and .env.development in root directory, add the database names below (or refer to your setup.sql file):
+
+```
+PGDATABASE=nc_news_test
+PGDATABASE=nc_news
+```
+
+Note: add your .env files to .gitignore.
+
+### 4. Create your local databases:
+
+```
+npm run setup-dbs
+```
+
+### 5. Seed your dev database
+
+```
+npm run seed
+```
+
+### 6. Run all tests
+
+```
+npm test
+```
+
+### 7. Run your server
+
+```
+npm start
+```
 
 ---
 
