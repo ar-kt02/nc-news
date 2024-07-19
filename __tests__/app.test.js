@@ -501,7 +501,7 @@ describe("/api/comments/:comment_id", () => {
             });
       });
 
-      test("PATCH 404: Responds with error msg 'Comment does not exist' when passed a comment id that does not exist", () => {
+      test("PATCH 404: Responds with error msg 'Comment not found' when passed a comment id that does not exist", () => {
          const patchData = { inc_votes: 50 };
 
          return request(app)
@@ -509,7 +509,7 @@ describe("/api/comments/:comment_id", () => {
             .send(patchData)
             .expect(404)
             .then(({ body: { msg } }) => {
-               expect(msg).toBe("Comment does not exist");
+               expect(msg).toBe("Comment not found");
             });
       });
 
