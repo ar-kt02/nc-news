@@ -480,6 +480,81 @@ describe("/api/comments/:comment_id", () => {
             });
       });
    });
+
+   describe("PATCH request", () => {
+      test("PATCH 200: Responds with successefuly updated comment by its id as an object", () => {
+         const patchData = { inc_votes: 24 };
+
+         return request(app)
+            .patch("/api/comments/9")
+            .send(patchData)
+            .then(({ body: { comment } }) => {
+               expect(comment).toEqual({
+                  comment_id: 9,
+                  body: "Superficially charming",
+                  article_id: 1,
+                  author: "icellusedkars",
+                  votes: 24,
+                  created_at: "2020-01-01T03:08:00.000Z",
+               });
+            });
+      });
+
+      test("PATCH 404: Responds with error msg 'Comment does not exist' when passed a comment id that does not exist", () => {
+         const patchData = { inc_votes: 50 };
+
+         return request(app)
+            .patch("/api/comments/91231")
+            .send(patchData)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Comment does not exist");
+            });
+      });
+
+      test("PATCH 400: Responds with error msg 'Bad request' when passed an invalid data type as comment id", () => {
+         const patchData = { inc_votes: 55 };
+
+         return request(app)
+            .patch("/api/comments/twothree")
+            .send(patchData)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with error msg 'Bad request' when passed an invalid data type as property value", () => {
+         const patchData = { inc_votes: "threefiddy" };
+
+         return request(app)
+            .patch("/api/comments/2")
+            .send(patchData)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with error msg 'Bad request' when patchData is empty", () => {
+         const patchData = {};
+
+         return request(app)
+            .patch("/api/comments/2")
+            .send(patchData)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+
+      test("PATCH 400: Responds with err message 'Bad request' when does not contain 'inc_votes' property", () => {
+         const patchData = { increment_votes: 23 };
+
+         return request(app)
+            .patch("/api/comments/2")
+            .send(patchData)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
+            });
+      });
+   });
 });
 
 describe("/api/users", () => {
