@@ -488,6 +488,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/9")
             .send(patchData)
+            .expect(200)
             .then(({ body: { comment } }) => {
                expect(comment).toEqual({
                   comment_id: 9,
@@ -506,6 +507,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/91231")
             .send(patchData)
+            .expect(404)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Comment does not exist");
             });
@@ -517,6 +519,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/twothree")
             .send(patchData)
+            .expect(400)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Bad request");
             });
@@ -528,6 +531,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/2")
             .send(patchData)
+            .expect(400)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Bad request");
             });
@@ -539,6 +543,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/2")
             .send(patchData)
+            .expect(400)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Bad request");
             });
@@ -550,6 +555,7 @@ describe("/api/comments/:comment_id", () => {
          return request(app)
             .patch("/api/comments/2")
             .send(patchData)
+            .expect(400)
             .then(({ body: { msg } }) => {
                expect(msg).toBe("Bad request");
             });
