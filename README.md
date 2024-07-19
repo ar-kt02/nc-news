@@ -45,19 +45,19 @@ Note: add your .env files to .gitignore.
 npm run setup-dbs
 ```
 
-### 5. Seed your dev database
+### 5. Seed your dev database:
 
 ```
 npm run seed
 ```
 
-### 6. Run all tests
+### 6. Run all tests:
 
 ```
 npm test
 ```
 
-### 7. Run your server
+### 7. Run your server:
 
 ```
 npm start
