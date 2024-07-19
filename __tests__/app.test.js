@@ -501,3 +501,29 @@ describe("/api/users", () => {
       });
    });
 });
+
+describe("/api/users/:username", () => {
+   describe("GET request", () => {
+      test("GET 200: Should respond an object of the user by its username with following properties: username, avatar_url, name", () => {
+         return request(app)
+            .get("/api/users/butter_bridge")
+            .expect(200)
+            .then(({ body: { user } }) => {
+               expect(user).toEqual({
+                  username: expect.any(String),
+                  avatar_url: expect.any(String),
+                  name: expect.any(String),
+               });
+            });
+      });
+
+      test("GET 404: Should respond with err msg 'User does not exist' when username does not exist in database", () => {
+         return request(app)
+            .get("/api/users/butter_123$$$- - $")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("User does not exist");
+            });
+      });
+   });
+});
