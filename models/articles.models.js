@@ -1,5 +1,9 @@
 const db = require("../db/connection");
-const { checkArticleExists } = require("../utils");
+const {
+   checkArticleExists,
+   checkTopicExists,
+   checkUserExists,
+} = require("../utils");
 
 exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
    const validSortBys = [
@@ -106,5 +110,44 @@ exports.updateArticleById = (article_id, inc_votes) => {
          return db.query(sqlStr, [inc_votes, article_id]).then(({ rows }) => {
             return rows[0];
          });
+      });
+};
+
+exports.insertArticle = (
+   author,
+   title,
+   body,
+   topic,
+   article_img_url = "https://img.freepik.com/free-vector/cartoon-smiley-frog-illustration_23-2148950572.jpg"
+) => {
+   return checkUserExists(author)
+      .then((result) => {
+         if (!result) {
+            return Promise.reject({
+               status: 404,
+               msg: "Username does not exist",
+            });
+         }
+      })
+      .then(() => {
+         return checkTopicExists(topic).then((result) => {
+            if (!result) {
+               return Promise.reject({ status: 404, msg: "Topic not found" });
+            }
+         });
+      })
+      .then(() => {
+         const sqlStr = `
+         INSERT INTO articles 
+         (author, title, body, topic, article_img_url) 
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING *,
+         0 AS comment_count`;
+
+         return db
+            .query(sqlStr, [author, title, body, topic, article_img_url])
+            .then(({ rows }) => {
+               return rows[0];
+            });
       });
 };

@@ -23,3 +23,11 @@ exports.checkCommentExists = (comment_id) => {
       return rows.length > 0 ? true : false;
    });
 };
+
+exports.checkTopicExists = (slug) => {
+   const sqlStr = "SELECT * FROM topics WHERE slug = $1";
+
+   return db.query(sqlStr, [slug]).then(({ rows }) => {
+      return rows.length > 0 ? true : false;
+   });
+};
