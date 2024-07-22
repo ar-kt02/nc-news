@@ -168,37 +168,39 @@ describe("/api/articles/:article_id", () => {
 });
 
 describe("/api/articles", () => {
-   test("GET 200: Should respond with all articles as an array of objects without body property", () => {
-      return request(app)
-         .get("/api/articles")
-         .expect(200)
-         .then(({ body: { articles } }) => {
-            expect(articles.length).toBeGreaterThan(0);
-            articles.forEach((article) => {
-               expect(article).toMatchObject({
-                  author: expect.any(String),
-                  title: expect.any(String),
-                  article_id: expect.any(Number),
-                  topic: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  article_img_url: expect.any(String),
-                  comment_count: expect.any(Number),
+   describe("GET Request", () => {
+      test("GET 200: Should respond with all articles as an array of objects without body property", () => {
+         return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles.length).toBeGreaterThan(0);
+               articles.forEach((article) => {
+                  expect(article).toMatchObject({
+                     author: expect.any(String),
+                     title: expect.any(String),
+                     article_id: expect.any(Number),
+                     topic: expect.any(String),
+                     created_at: expect.any(String),
+                     votes: expect.any(Number),
+                     article_img_url: expect.any(String),
+                     comment_count: expect.any(Number),
+                  });
+                  expect(article).not.toHaveProperty("body");
                });
-               expect(article).not.toHaveProperty("body");
             });
-         });
-   });
+      });
 
-   test("GET 200: Should respond with all articles sorted by date created in descending order by default", () => {
-      return request(app)
-         .get("/api/articles")
-         .expect(200)
-         .then(({ body: { articles } }) => {
-            expect(articles).toBeSortedBy("created_at", {
-               descending: true,
+      test("GET 200: Should respond with all articles sorted by date created in descending order by default", () => {
+         return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+               expect(articles).toBeSortedBy("created_at", {
+                  descending: true,
+               });
             });
-         });
+      });
    });
 
    describe("GET Request: Sorting queries", () => {
@@ -294,6 +296,91 @@ describe("/api/articles", () => {
                      comment_count: expect.any(Number),
                   });
                });
+            });
+      });
+   });
+
+   describe("POST Request", () => {
+      test("POST 201: Should respond an object with properties: { article_id, votes, created_at, comment_count, author, title, body, topic, article_img url } when successfully inserted", () => {
+         const newArticle = {
+            author: "butter_bridge",
+            title: "Cat in the beach",
+            body: "Clearly needs to learn how to swim... The End.",
+            topic: "cats",
+            article_img_url:
+               "https://img.freepik.com/free-vector/cute-cat-frog-sitting-leaf-cartoon-vector-icon-illustration-animal-nature-icon-concept-isolated-premium-vector-flat-cartoon-style_138676-3681.jpg",
+         };
+
+         return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body: { article } }) => {
+               expect(article).toEqual({
+                  article_id: expect.any(Number),
+                  votes: 0,
+                  created_at: expect.any(String),
+                  comment_count: 0,
+                  author: "butter_bridge",
+                  title: "Cat in the beach",
+                  body: "Clearly needs to learn how to swim... The End.",
+                  topic: "cats",
+                  article_img_url:
+                     "https://img.freepik.com/free-vector/cute-cat-frog-sitting-leaf-cartoon-vector-icon-illustration-animal-nature-icon-concept-isolated-premium-vector-flat-cartoon-style_138676-3681.jpg",
+               });
+            });
+      });
+
+      test("POST 404: Should respond with err message 'Username does not exist' when author does not exist in users database", () => {
+         const newArticle = {
+            author: "bridge_butter",
+            title: "Some title",
+            body: "Some story... The End.",
+            topic: "cats",
+            article_img_url:
+               "https://img.freepik.com/free-vector/cute-cat-frog-sitting-leaf-cartoon-vector-icon-illustration-animal-nature-icon-concept-isolated-premium-vector-flat-cartoon-style_138676-3681.jpg",
+         };
+
+         return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Username does not exist");
+            });
+      });
+
+      test("POST 404: Should respond with err message 'Topic not found' when topic does not exist in topics database", () => {
+         const newArticle = {
+            author: "butter_bridge",
+            title: "Some title",
+            body: "Some story... The End.",
+            topic: "sharks",
+            article_img_url:
+               "https://img.freepik.com/free-vector/cute-cat-frog-sitting-leaf-cartoon-vector-icon-illustration-animal-nature-icon-concept-isolated-premium-vector-flat-cartoon-style_138676-3681.jpg",
+         };
+
+         return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Topic not found");
+            });
+      });
+
+      test("POST 400: Should respond with err message 'Bad request' when missing properties: title or body", () => {
+         const newArticle = {
+            author: "butter_bridge",
+            topic: "cats",
+         };
+
+         return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Bad request");
             });
       });
    });

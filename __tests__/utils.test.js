@@ -8,6 +8,7 @@ const {
    checkArticleExists,
    checkUserExists,
    checkCommentExists,
+   checkTopicExists,
 } = require("../utils.js");
 
 afterAll(() => {
@@ -148,6 +149,20 @@ describe("checkCommentExists", () => {
 
    test("returns false if comment does not exist", () => {
       return checkCommentExists(123442).then((result) => {
+         expect(result).toBe(false);
+      });
+   });
+});
+
+describe("checkTopicExists", () => {
+   test("returns true if topic exists", () => {
+      return checkTopicExists("cats").then((result) => {
+         expect(result).toBe(true);
+      });
+   });
+
+   test("returns false if topic does not exist", () => {
+      return checkTopicExists("nocats").then((result) => {
          expect(result).toBe(false);
       });
    });
