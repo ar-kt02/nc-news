@@ -7,11 +7,11 @@ const {
 } = require("../models/articles.models.js");
 
 exports.getArticles = (request, response, next) => {
-   const { sort_by, order, topic } = request.query;
+   const { sort_by, order, topic, limit, p } = request.query;
 
-   fetchArticles(sort_by, order, topic)
-      .then((articles) => {
-         response.status(200).send({ articles });
+   fetchArticles(sort_by, order, topic, limit, p)
+      .then(({ articles, total_count }) => {
+         response.status(200).send({ articles, total_count });
       })
       .catch(next);
 };

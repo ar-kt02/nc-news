@@ -3,9 +3,16 @@ const {
    checkArticleExists,
    checkTopicExists,
    checkUserExists,
+   countTotalArticles,
 } = require("../utils");
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.fetchArticles = (
+   sort_by = "created_at",
+   order = "desc",
+   topic,
+   limit = 10,
+   p = 1
+) => {
    const validSortBys = [
       "article_id",
       "title",
@@ -21,7 +28,11 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
 
    if (
       !validSortBys.includes(sort_by) ||
-      !validOrders.includes(order.toLowerCase())
+      !validOrders.includes(order.toLowerCase()) ||
+      isNaN(limit) ||
+      limit < 1 ||
+      isNaN(p) ||
+      p < 1
    ) {
       return Promise.reject({ status: 400, msg: "Invalid query" });
    }
@@ -48,9 +59,18 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
    }
 
    sqlStr += ` ORDER BY ${sort_by} ${order.toLowerCase()}`;
+   sqlStr += ` LIMIT $${queryValues.length + 1} OFFSET $${
+      queryValues.length + 2
+   }`;
+   queryValues.push(limit, (p - 1) * limit);
 
-   return db.query(sqlStr, queryValues).then(({ rows }) => {
-      return rows;
+   return countTotalArticles(topic).then((total_count) => {
+      return db.query(sqlStr, queryValues).then(({ rows }) => {
+         return {
+            articles: rows,
+            total_count,
+         };
+      });
    });
 };
 
