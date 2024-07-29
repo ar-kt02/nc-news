@@ -3,6 +3,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const db = require("../db/connection");
+const articles = require("../db/data/test-data/articles");
 
 beforeEach(() => {
    return seed(testData);
@@ -248,12 +249,13 @@ describe("/api/articles", () => {
    });
 
    describe("GET Request: Topic query", () => {
-      test("GET 200: Should respond with articles filtered by topic query", () => {
+      test("GET 200: Should respond with articles (by default limit 10) filtered by topic query", () => {
          return request(app)
             .get("/api/articles?topic=mitch")
             .expect(200)
-            .then(({ body: { articles } }) => {
-               expect(articles.length).toBe(12);
+            .then(({ body: { articles, total_count } }) => {
+               expect(articles.length).toBe(10);
+               expect(total_count).toBe(12);
                articles.forEach((article) => {
                   expect(article).toMatchObject({
                      author: expect.any(String),
@@ -278,12 +280,13 @@ describe("/api/articles", () => {
             });
       });
 
-      test("GET 200: Should respond with all articles if query value is empty", () => {
+      test("GET 200: Should respond with all articles (by default limit 10) if query value is empty", () => {
          return request(app)
             .get("/api/articles?topic=")
             .expect(200)
-            .then(({ body: { articles } }) => {
-               expect(articles.length).toBe(13);
+            .then(({ body: { articles, total_count } }) => {
+               expect(articles.length).toBe(10);
+               expect(total_count).toBe(13);
                articles.forEach((article) => {
                   expect(article).toMatchObject({
                      author: expect.any(String),
@@ -296,6 +299,56 @@ describe("/api/articles", () => {
                      comment_count: expect.any(Number),
                   });
                });
+            });
+      });
+   });
+
+   describe("GET Request (pagination)", () => {
+      test("GET 200: Should respond with articles by its given limit query", () => {
+         return request(app)
+            .get("/api/articles?limit=6")
+            .expect(200)
+            .then(({ body: { articles, total_count } }) => {
+               expect(articles.length).toBe(6);
+               expect(total_count).toBe(13);
+            });
+      });
+
+      test("GET 200: Should respond with error msg 'Invalid query' when given an invalid data type as limit query value", () => {
+         return request(app)
+            .get("/api/articles?limit=$d -f")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toEqual("Invalid query");
+            });
+      });
+
+      test("GET 200: Should respond with articles (by default limit 10) for page 1 query value", () => {
+         return request(app)
+            .get("/api/articles?p=1")
+            .expect(200)
+            .then(({ body: { articles, total_count } }) => {
+               expect(articles.length).toBe(10);
+               expect(total_count).toBe(13);
+            });
+      });
+
+      test("GET 200: Should respond with articles by its topic query for page 2", () => {
+         return request(app)
+            .get("/api/articles?topic=mitch&p=2")
+            .expect(200)
+            .then(({ body: { articles, total_count } }) => {
+               expect(articles.length).toBe(2);
+               expect(total_count).toBe(12);
+            });
+      });
+
+      test("GET 400: Should respond with err msg 'Invalid query' when passed an invalid data type as page query", () => {
+         return request(app)
+            .get("/api/articles?p=$v--vm2")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+               expect(msg).toBe("Invalid query");
             });
       });
    });

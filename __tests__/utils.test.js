@@ -9,6 +9,7 @@ const {
    checkUserExists,
    checkCommentExists,
    checkTopicExists,
+   countTotalArticles,
 } = require("../utils.js");
 
 afterAll(() => {
@@ -164,6 +165,20 @@ describe("checkTopicExists", () => {
    test("returns false if topic does not exist", () => {
       return checkTopicExists("nocats").then((result) => {
          expect(result).toBe(false);
+      });
+   });
+});
+
+describe("countTotalArticles", () => {
+   test("returns total count of articles", () => {
+      return countTotalArticles().then((result) => {
+         expect(result).toBe(13);
+      });
+   });
+
+   test("returns total count of articles by its given topic", () => {
+      return countTotalArticles("cats").then((result) => {
+         expect(result).toBe(1);
       });
    });
 });

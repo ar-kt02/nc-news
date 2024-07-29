@@ -31,3 +31,17 @@ exports.checkTopicExists = (slug) => {
       return rows.length > 0 ? true : false;
    });
 };
+
+exports.countTotalArticles = (topic) => {
+   let sqlStr = `SELECT COUNT(*)::INT as total_count FROM articles`;
+   let queryValues = [];
+
+   if (topic) {
+      sqlStr += ` WHERE topic = $1`;
+      queryValues.push(topic);
+   }
+
+   return db.query(sqlStr, queryValues).then(({ rows }) => {
+      return rows[0].total_count;
+   });
+};
